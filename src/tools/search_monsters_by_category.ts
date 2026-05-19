@@ -57,7 +57,7 @@ export function registerSearchMonstersByCategory(server: McpServer) {
         content: [
           {
             type: "text",
-            text: `TODO: search_monsters_by_category(category=${category}, limit=${limit}) — not yet implemented`,
+            text: `Found ${rows.length} monsters in category "${category}":\n\n${lines.join("\n")}`,
           },
         ],
       };

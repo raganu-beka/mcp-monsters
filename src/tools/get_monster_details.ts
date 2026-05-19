@@ -78,12 +78,7 @@ export function registerGetMonsterDetails(server: McpServer) {
       );
 
       return {
-        content: [
-          {
-            type: "text",
-            text: `TODO: get_monster_details(name=${name}) — not yet implemented`,
-          },
-        ],
+        content: [{ type: "text", text }],
       };
     },
   );
