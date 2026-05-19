@@ -26,6 +26,10 @@ against) for matchup calculations.
   X-type monsters."
 - \`get_monster_details(name)\` — full profile for one monster. Use after a
   search to drill down, or directly when the user names a monster.
+- \`compare_monsters(name_a, name_b)\` — side-by-side comparison of two
+  monsters. Returns categories, types, rarities, primary powers, and full
+  augments/hindrances tables for both. Use when the user asks which monster
+  is stronger or wants to compare two specific monsters.
 - \`list_categories()\` — the six categories with descriptions. Use when
   the user asks "what kinds of monsters exist?" (Also available as the
   \`monsters://categories\` Resource — cacheable.)
