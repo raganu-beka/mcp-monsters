@@ -8,10 +8,24 @@ import { registerSchemaResource } from "./resources/schema.ts";
 import { registerMonstersCategoriesResource } from "./resources/monsters_categories.ts";
 import { registerAnalyzeMonsterPrompt } from "./prompts/analyze_monster.ts";
 
-const server = new McpServer({
-  name: "mcp-monsters",
-  version: "0.1.0",
-});
+const server = new McpServer(
+  {
+    name: "ragmonsters-server",
+    version: "0.1.0",
+  },
+  {
+    instructions: [
+      "This server exposes a small catalogue of fictional monsters (the RAGmonsters dataset).",
+      "",
+      "Before using any Tool for the first time in a conversation, read the `monsters://schema` Resource. It describes the domain (six monster categories, what each Tool does, what is deliberately not exposed) and will save you from guessing category names or Tool semantics.",
+      "",
+      "Quick map:",
+      "- `monsters://schema` — hand-written domain overview. Read first.",
+      "- `monsters://categories` — the six valid category names with descriptions.",
+      "- Tools: `search_monsters_by_category`, `get_monster_details`, `list_categories`.",
+    ].join("\n"),
+  },
+);
 
 registerSearchMonstersByCategory(server);
 registerGetMonsterDetails(server);
