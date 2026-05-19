@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { sql } from "../db.ts";
+import { sanitizeText } from "../sanitize.ts";
 
 type MonsterRow = {
   monster_id: number;
@@ -79,6 +80,20 @@ export function registerCompareMonsters(server: McpServer) {
           Affinity[]
         >`SELECT target_name, modifier FROM hindrances WHERE monster_id = ${b.monster_id}`,
       ]);
+
+      const sanitize = (arr: Affinity[], fieldPrefix: string): Affinity[] =>
+        arr.map((row) => ({
+          ...row,
+          target_name: sanitizeText(
+            row.target_name,
+            `${fieldPrefix}.target_name`,
+          ),
+        }));
+
+      const aAugS = sanitize(aAug, "a.augments");
+      const aHinS = sanitize(aHin, "a.hindrances");
+      const bAugS = sanitize(bAug, "b.augments");
+      const bHinS = sanitize(bHin, "b.hindrances");
 
       return {
         content: [
