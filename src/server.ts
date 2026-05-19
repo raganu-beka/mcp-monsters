@@ -10,7 +10,7 @@ import { registerAnalyzeMonsterPrompt } from "./prompts/analyze_monster.ts";
 
 const server = new McpServer(
   {
-    name: "ragmonsters-server",
+    name: "mcp-monsters",
     version: "0.1.0",
   },
   {

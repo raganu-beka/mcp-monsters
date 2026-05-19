@@ -19,16 +19,37 @@ export function registerGetMonsterDetails(server: McpServer) {
       const start = Date.now();
       logCall("tool", "get_monster_details", { name });
 
-      const rows = await sql`
-    SELECT
-      m.name, m.monster_type, m.habitat, m.biome, m.rarity,
-      m.height, m.weight, m.appearance,
-      m.primary_power, m.secondary_power, m.special_ability,
-      m.weakness, m.behavior_ecology, m.notable_specimens
-    FROM monsters m
-    WHERE LOWER(m.name) = LOWER(${name})
-    LIMIT 1
-  `;
+      const rows = await sql<
+        {
+          name: string;
+          monster_type: string;
+          habitat: string;
+          biome: string;
+          rarity: string;
+          height: string;
+          weight: string;
+          appearance: string;
+          primary_power: string;
+          secondary_power: string;
+          special_ability: string;
+          weakness: string;
+          behavior_ecology: string;
+          notable_specimens: string;
+          category_name: string;
+        }[]
+      >`
+      SELECT
+        m.name, m.monster_type, m.habitat, m.biome, m.rarity,
+        m.height, m.weight, m.appearance,
+        m.primary_power, m.secondary_power, m.special_ability,
+        m.weakness, m.behavior_ecology, m.notable_specimens,
+        c.category_name
+      FROM monsters m
+      JOIN subcategories s ON s.subcategory_id = m.subcategory_id
+      JOIN categories c ON c.category_id = s.category_id
+      WHERE LOWER(m.name) = LOWER(${name})
+      LIMIT 1
+    `;
 
       if (rows.length === 0) {
         logResult(
@@ -40,45 +61,44 @@ export function registerGetMonsterDetails(server: McpServer) {
           content: [
             {
               type: "text",
-              text: `No monster found with name "${name}". Try \`search_monsters_by_category\` to browse.`,
+              text: JSON.stringify(
+                {
+                  error: `Monster "${name}" not found.`,
+                  source: "RAGmonsters DB · mcp-monsters",
+                  next: [`list_categories({})`],
+                },
+                null,
+                2,
+              ),
             },
           ],
         };
       }
 
       const m = rows[0]!;
-      const text = [
-        `# ${m.name}`,
-        ``,
-        `**Type:** ${m.monster_type} · **Habitat:** ${m.habitat} (${m.biome}) · **Rarity:** ${m.rarity}`,
-        `**Size:** ${m.height} · ${m.weight}`,
-        ``,
-        `## Appearance`,
-        m.appearance,
-        ``,
-        `## Powers`,
-        `- **Primary:** ${m.primary_power}`,
-        `- **Secondary:** ${m.secondary_power}`,
-        `- **Special:** ${m.special_ability}`,
-        ``,
-        `## Weakness`,
-        m.weakness,
-        ``,
-        `## Behaviour`,
-        m.behavior_ecology,
-        ``,
-        `## Notable specimens`,
-        m.notable_specimens,
-      ].join("\n");
-
       logResult(
         "get_monster_details",
         `found name="${m.name}"`,
         Date.now() - start,
       );
-
       return {
-        content: [{ type: "text", text }],
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                data: m,
+                summary: `${m.name} — ${m.rarity} ${m.monster_type} from ${m.habitat} (${m.category_name}).`,
+                source: "RAGmonsters DB · mcp-monsters",
+                next: [
+                  `search_monsters_by_category({ category: "${m.category_name}", limit: 10 })`,
+                ],
+              },
+              null,
+              2,
+            ),
+          },
+        ],
       };
     },
   );

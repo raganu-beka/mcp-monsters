@@ -21,15 +21,22 @@ export function registerSearchMonstersByCategory(server: McpServer) {
       const start = Date.now();
       logCall("tool", "search_monsters_by_category", { category, limit });
 
-      const rows = await sql`
-            SELECT m.name, m.monster_type, m.habitat, m.rarity
-            FROM monsters m
-            JOIN subcategories s ON s.subcategory_id = m.subcategory_id
-            JOIN categories c ON c.category_id = s.category_id
-            WHERE c.category_name = ${category}
-            ORDER BY m.name
-            LIMIT ${limit} OFFSET ${offset}
-        `;
+      const rows = await sql<
+        {
+          name: string;
+          monster_type: string;
+          habitat: string;
+          rarity: string;
+        }[]
+      >`
+        SELECT m.name, m.monster_type, m.habitat, m.rarity
+        FROM monsters m
+        JOIN subcategories s ON s.subcategory_id = m.subcategory_id
+        JOIN categories c ON c.category_id = s.category_id
+        WHERE c.category_name = ${category}
+        ORDER BY m.name
+        LIMIT ${limit} OFFSET ${offset}
+    `;
 
       const [{ total }] = await sql<{ total: number }[]>`
             SELECT count(*)::int AS total
@@ -70,11 +77,6 @@ export function registerSearchMonstersByCategory(server: McpServer) {
         };
       }
 
-      const lines = rows.map(
-        (m) =>
-          `- **${m.name}** — ${m.monster_type} · ${m.habitat} · ${m.rarity}`,
-      );
-
       logResult(
         "search_monsters_by_category",
         `found=${rows.length}`,
@@ -89,7 +91,7 @@ export function registerSearchMonstersByCategory(server: McpServer) {
               {
                 data: rows,
                 summary: `Found ${rows.length} of ${total} monsters in category "${category}"${hasMore ? " (more available — see `next`)" : ""}.`,
-                source: "RAGmonsters DB · mpc-monsters",
+                source: "RAGmonsters DB · mcp-monsters",
                 next,
               },
               null,

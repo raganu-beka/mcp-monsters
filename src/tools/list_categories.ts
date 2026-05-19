@@ -14,15 +14,11 @@ export function registerListCategories(server: McpServer) {
       const start = Date.now();
       logCall("tool", "list_categories", {});
 
-      const rows = await sql`
+      const rows = await sql<{ category_name: string; description: string }[]>`
         SELECT category_name, description
         FROM categories
         ORDER BY category_name
     `;
-
-      const lines = rows.map(
-        (c) => `- **${c.category_name}** — ${c.description}`,
-      );
 
       logResult("list_categories", `count=${rows.length}`, Date.now() - start);
 
@@ -30,7 +26,19 @@ export function registerListCategories(server: McpServer) {
         content: [
           {
             type: "text",
-            text: `Monster categories:\n\n${lines.join("\n")}`,
+            text: JSON.stringify(
+              {
+                data: rows,
+                summary: `${rows.length} categories available.`,
+                source: "RAGmonsters DB · mcp-monsters",
+                next: rows.map(
+                  (r) =>
+                    `search_monsters_by_category({ category: "${r.category_name}" })`,
+                ),
+              },
+              null,
+              2,
+            ),
           },
         ],
       };
