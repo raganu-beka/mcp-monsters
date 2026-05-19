@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "postgres": "^3.4.9",
     "zod": "^4.4.3"
   },
   "scripts": {
