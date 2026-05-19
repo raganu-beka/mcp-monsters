@@ -1,7 +1,6 @@
 import { logCall, logResult } from "../log.ts";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-
-import { sql } from "../db.ts";
+import { getCachedCategories } from "../cache.ts";
 
 export function registerListCategories(server: McpServer) {
   server.registerTool(
@@ -14,11 +13,7 @@ export function registerListCategories(server: McpServer) {
       const start = Date.now();
       logCall("tool", "list_categories", {});
 
-      const rows = await sql<{ category_name: string; description: string }[]>`
-        SELECT category_name, description
-        FROM categories
-        ORDER BY category_name
-    `;
+      const rows = getCachedCategories();
 
       logResult("list_categories", `count=${rows.length}`, Date.now() - start);
 

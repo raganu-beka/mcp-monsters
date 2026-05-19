@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { logCall, logResult } from "../log.ts";
-import { sql } from "../db.ts";
+import { getCachedCategories } from "../cache.ts";
 
 export function registerMonstersCategoriesResource(server: McpServer) {
   server.registerResource(
@@ -16,11 +16,7 @@ export function registerMonstersCategoriesResource(server: McpServer) {
       const start = Date.now();
       logCall("resource", "monsters://categories", { uri: uri.href });
 
-      const rows = await sql`
-    SELECT category_name, description
-    FROM categories
-    ORDER BY category_name
-  `;
+      const rows = getCachedCategories();
 
       logResult(
         "monsters://categories",
