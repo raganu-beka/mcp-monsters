@@ -1,18 +1,3 @@
-// A small logger that grows across the module.
-//
-// Why log from 3.0? Every "Observe" beat below — every time we ask the LLM
-// a question — we want to *see* which primitive fired, with what args,
-// in what order. Without that, we're guessing. With it, we're watching.
-//
-// We write to TWO sinks:
-//   1. logs/server.log — file you tail in a side terminal. This is the
-//      workshop's observation surface, because Claude Code spawns its own
-//      copy of the server (per .mcp.json) and you cannot see *its* stderr.
-//      `tail -f logs/server.log` in a third terminal gives you the trace.
-//   2. stderr (console.error) — visible when you run the server standalone
-//      (smoke tests, manual debugging). stdout is the JSON-RPC channel —
-//      NEVER log there or you break MCP.
-
 import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 
 type Primitive = "tool" | "resource" | "prompt";
