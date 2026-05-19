@@ -4,6 +4,34 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { sql } from "../db.ts";
+import { sanitizeText } from "../sanitize.ts";
+
+const monsterDetailsOutput = z
+  .object({
+    data: z
+      .object({
+        name: z.string(),
+        monster_type: z.string(),
+        habitat: z.string(),
+        biome: z.string(),
+        rarity: z.string(),
+        height: z.string(),
+        weight: z.string(),
+        appearance: z.string(),
+        primary_power: z.string(),
+        secondary_power: z.string(),
+        special_ability: z.string(),
+        weakness: z.string(),
+        behavior_ecology: z.string(),
+        notable_specimens: z.string(),
+        category_name: z.string(),
+      })
+      .strict(),
+    summary: z.string(),
+    source: z.string(),
+    next: z.array(z.string()),
+  })
+  .strict();
 
 export function registerGetMonsterDetails(server: McpServer) {
   server.registerTool(
@@ -76,27 +104,65 @@ export function registerGetMonsterDetails(server: McpServer) {
       }
 
       const m = rows[0]!;
+
+      const sanitized = {
+        ...m,
+        appearance: sanitizeText(m.appearance, "appearance"),
+        weakness: sanitizeText(m.weakness, "weakness"),
+        behavior_ecology: sanitizeText(m.behavior_ecology, "behavior_ecology"),
+        notable_specimens: sanitizeText(
+          m.notable_specimens,
+          "notable_specimens",
+        ),
+      };
+
+      const envelope = {
+        data: sanitized,
+        summary: `${sanitized.name} — ${sanitized.rarity} ${sanitized.monster_type} from ${sanitized.habitat} (${sanitized.category_name}).`,
+        source: "RAGmonsters DB · mcp-monsters",
+        next: [
+          `search_monsters_by_category({ category: "${sanitized.category_name}", limit: 10 })`,
+        ],
+      };
+
+      const parsed = monsterDetailsOutput.safeParse(envelope);
+      if (!parsed.success) {
+        logResult(
+          "get_monster_details",
+          `output_validation_fail name="${m.name}"`,
+          Date.now() - start,
+        );
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  error: "Server response did not match expected schema.",
+                  source: "RAGmonsters DB · mcp-monsters",
+                  next: [
+                    `search_monsters_by_category({ category: "Elemental" })`,
+                  ],
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+
       logResult(
         "get_monster_details",
         `found name="${m.name}"`,
         Date.now() - start,
       );
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(
-              {
-                data: m,
-                summary: `${m.name} — ${m.rarity} ${m.monster_type} from ${m.habitat} (${m.category_name}).`,
-                source: "RAGmonsters DB · mcp-monsters",
-                next: [
-                  `search_monsters_by_category({ category: "${m.category_name}", limit: 10 })`,
-                ],
-              },
-              null,
-              2,
-            ),
+            text: JSON.stringify(parsed.data, null, 2),
           },
         ],
       };
