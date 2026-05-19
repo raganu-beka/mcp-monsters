@@ -33,3 +33,8 @@ export function logResult(
   const ts = new Date().toISOString();
   emit(`[${ts}] result=${name} ${summary} ${durationMs}ms`);
 }
+
+export function logEvent(message: string): void {
+  const ts = new Date().toISOString();
+  emit(`[${ts}] ${message}`);
+}

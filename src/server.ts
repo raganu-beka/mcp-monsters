@@ -8,6 +8,8 @@ import { registerSchemaResource } from "./resources/schema.ts";
 import { registerMonstersCategoriesResource } from "./resources/monsters_categories.ts";
 import { registerAnalyzeMonsterPrompt } from "./prompts/analyze_monster.ts";
 
+import { initializeCache } from "./cache.ts";
+
 const server = new McpServer(
   {
     name: "mcp-monsters",
@@ -35,6 +37,8 @@ registerMonstersCategoriesResource(server);
 registerSchemaResource(server);
 
 registerAnalyzeMonsterPrompt(server);
+
+await initializeCache();
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
