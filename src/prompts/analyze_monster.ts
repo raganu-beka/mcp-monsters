@@ -16,7 +16,7 @@ export function registerAnalyzeMonsterPrompt(server: McpServer) {
     async ({ monster_name }) => {
       logCall("prompt", "analyze_monster", { monster_name });
 
-      const text = `Analyse the monster called "${monster_name}" using the ragmonsters-server.
+      const text = `Analyse the monster called "${monster_name}" using the mcp-monsters.
 
 Follow this workflow exactly — do not skip steps or invent your own ordering:
 
