@@ -5,8 +5,8 @@
     "zod": "^4.4.3"
   },
   "scripts": {
-    "dev": "bun --hot run src/weather-server.ts",
-    "start": "bun run src/weather-server.ts",
+    "dev": "bun --hot run src/server.ts",
+    "start": "bun run src/server.ts",
     "typecheck": "bunx tsc --noEmit"
   },
   "devDependencies": {
