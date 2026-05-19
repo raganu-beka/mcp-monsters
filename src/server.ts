@@ -7,6 +7,7 @@ import { registerListCategories } from "./tools/list_categories.ts";
 import { registerSchemaResource } from "./resources/schema.ts";
 import { registerMonstersCategoriesResource } from "./resources/monsters_categories.ts";
 import { registerAnalyzeMonsterPrompt } from "./prompts/analyze_monster.ts";
+import { registerCompareMonsters } from "./tools/compare_monsters.ts";
 
 import { initializeCache } from "./cache.ts";
 
@@ -32,6 +33,7 @@ const server = new McpServer(
 registerSearchMonstersByCategory(server);
 registerGetMonsterDetails(server);
 registerListCategories(server);
+registerCompareMonsters(server);
 
 registerMonstersCategoriesResource(server);
 registerSchemaResource(server);
