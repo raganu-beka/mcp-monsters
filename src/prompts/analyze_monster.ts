@@ -18,7 +18,7 @@ export function registerAnalyzeMonsterPrompt(server: McpServer) {
 
       const text = `Analyse the monster called "${monster_name}".
 
-    Use the ragmonsters-server Tools. Cover these points:
+    Use the mcp-monsters Tools. Cover these points:
     1. Profile (category, type, habitat, rarity)
     2. Powers (primary, secondary, special)
     3. Weakness
