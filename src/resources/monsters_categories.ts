@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { logCall, logResult } from "../log.ts";
 import { getCachedCategories } from "../cache.ts";
+import { checkAuthResource } from "../auth.ts";
 
 export function registerMonstersCategoriesResource(server: McpServer) {
   server.registerResource(
@@ -13,6 +14,9 @@ export function registerMonstersCategoriesResource(server: McpServer) {
       mimeType: "application/json",
     },
     async (uri) => {
+      const denied = checkAuthResource(uri.href, "monsters://categories");
+      if (denied) return denied;
+
       const start = Date.now();
       logCall("resource", "monsters://categories", { uri: uri.href });
 

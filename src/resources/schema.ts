@@ -1,4 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { checkAuthResource } from "../auth.ts";
+import { logCall } from "../log.ts";
 
 const SCHEMA_DESCRIPTION = `# RAGmonsters database overview
 
@@ -49,14 +51,22 @@ export function registerSchemaResource(server: McpServer) {
         "Hand-written domain overview of the RAGmonsters dataset. Read this first to understand what Tools to reach for.",
       mimeType: "text/markdown",
     },
-    async (uri) => ({
-      contents: [
-        {
-          uri: uri.href,
-          mimeType: "text/markdown",
-          text: SCHEMA_DESCRIPTION,
-        },
-      ],
-    }),
+    async (uri) => {
+      const denied = checkAuthResource(uri.href, "monsters://schema");
+      if (denied) return denied;
+
+      const start = Date.now();
+      logCall("resource", "monsters://schema", { uri: uri.href });
+
+      return {
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: "text/markdown",
+            text: SCHEMA_DESCRIPTION,
+          },
+        ],
+      };
+    },
   );
 }

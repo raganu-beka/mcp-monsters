@@ -3,6 +3,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { sql } from "../db.ts";
 import { sanitizeText } from "../sanitize.ts";
+import { checkAuth } from "../auth.ts";
+import { logCall } from "../log.ts";
 
 type MonsterRow = {
   monster_id: number;
@@ -34,6 +36,12 @@ export function registerCompareMonsters(server: McpServer) {
       },
     },
     async ({ name_a, name_b }) => {
+      const denied = checkAuth("compare_monsters");
+      if (denied) return denied;
+
+      const start = Date.now();
+      logCall("tool", "compare_monsters", { name_a, name_b });
+
       const rows = await sql<MonsterRow[]>`
         SELECT m.monster_id, m.name, m.monster_type, m.habitat, m.rarity,
                m.primary_power, c.category_name

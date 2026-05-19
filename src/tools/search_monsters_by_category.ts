@@ -4,6 +4,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { CATEGORIES } from "../categories.ts";
 import { sql } from "../db.ts";
+import { checkAuth } from "../auth.ts";
 
 export function registerSearchMonstersByCategory(server: McpServer) {
   server.registerTool(
@@ -18,6 +19,9 @@ export function registerSearchMonstersByCategory(server: McpServer) {
       },
     },
     async ({ category, limit, offset }) => {
+      const denied = checkAuth("search_monsters_by_category");
+      if (denied) return denied;
+
       const start = Date.now();
       logCall("tool", "search_monsters_by_category", { category, limit });
 

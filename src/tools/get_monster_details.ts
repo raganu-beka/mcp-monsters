@@ -5,6 +5,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { sql } from "../db.ts";
 import { sanitizeText } from "../sanitize.ts";
+import { checkAuth } from "../auth.ts";
 
 const monsterDetailsOutput = z
   .object({
@@ -44,6 +45,9 @@ export function registerGetMonsterDetails(server: McpServer) {
       },
     },
     async ({ name }) => {
+      const denied = checkAuth("get_monster_details");
+      if (denied) return denied;
+
       const start = Date.now();
       logCall("tool", "get_monster_details", { name });
 

@@ -1,6 +1,7 @@
 import { logCall, logResult } from "../log.ts";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getCachedCategories } from "../cache.ts";
+import { checkAuth } from "../auth.ts";
 
 export function registerListCategories(server: McpServer) {
   server.registerTool(
@@ -10,6 +11,9 @@ export function registerListCategories(server: McpServer) {
         "List all valid monster categories with their descriptions. Six entries — bounded, doesn't change.",
     },
     async () => {
+      const denied = checkAuth("list_categories");
+      if (denied) return denied;
+
       const start = Date.now();
       logCall("tool", "list_categories", {});
 

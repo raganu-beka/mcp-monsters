@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { logCall } from "../log.ts";
+import { checkAuthPrompt } from "../auth.ts";
 
 export function registerAnalyzeMonsterPrompt(server: McpServer) {
   server.registerPrompt(
@@ -14,6 +15,9 @@ export function registerAnalyzeMonsterPrompt(server: McpServer) {
       },
     },
     async ({ monster_name }) => {
+      const denied = checkAuthPrompt("analyze_monster");
+      if (denied) return denied;
+
       logCall("prompt", "analyze_monster", { monster_name });
 
       const text = `Analyse the monster called "${monster_name}" using the mcp-monsters.
