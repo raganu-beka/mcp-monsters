@@ -25,7 +25,7 @@ const server = new McpServer(
       "Quick map:",
       "- `monsters://schema` — hand-written domain overview. Read first.",
       "- `monsters://categories` — the six valid category names with descriptions.",
-      "- Tools: `search_monsters_by_category`, `get_monster_details`, `list_categories`.",
+      "- Tools: `search_monsters_by_category`, `get_monster_details`, `compare_monsters`, `list_categories`.",
     ].join("\n"),
   },
 );
